@@ -109,14 +109,19 @@ def login():
     if session.get("user_id"):
         return redirect(url_for("profile"))
     if request.method == "POST":
-        email = request.form.get("email", "").strip()
+        email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
+
+        if not email or not password:
+            flash("All fields are required.", "error")
+            return render_template("login.html", form=request.form)
 
         user = get_user_by_email(email)
         if not user or not check_password_hash(user["password_hash"], password):
             flash("Invalid email or password.", "error")
-            return render_template("login.html")
+            return render_template("login.html", form=request.form)
 
+        session.clear()
         session["user_id"] = user["id"]
         session["user_name"] = user["name"]
         return redirect(url_for("profile"))

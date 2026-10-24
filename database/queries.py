@@ -58,6 +58,11 @@ def insert_expense(user_id, amount, category, expense_date, description):
 
 def _build_date_filter(date_from, date_to):
     if date_from and date_to:
+        try:
+            datetime.strptime(date_from, "%Y-%m-%d")
+            datetime.strptime(date_to, "%Y-%m-%d")
+        except (ValueError, TypeError):
+            return "AND 1 = 0", []
         return "AND date BETWEEN ? AND ?", [date_from, date_to]
     return "", []
 
